@@ -5,19 +5,27 @@
 
 using namespace std;
 
-// Kích thước màn hình
+// kích thước màn hình
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
-// Kích thước nhân vật
+// Thông số nhân vật
 const int CHARACTER_WIDTH = 40;
 const int CHARACTER_HEIGHT = 50;
+int characterPosX =  380;
+int characterPosY = 500;
 
 // Thông số item
 const int ITEM_WIDTH = 30;
 const int ITEM_HEIGHT = 30;
 int itemPosX = 400;
 int itemPosY = 300;
+
+// Platform
+const int PLATFORM_WIDTH = 800;
+const int PLATFORM_HEIGHT = 75;
+const int platformPosX = 0;
+const int platformPosY = 525;
 
 // Khởi tạo
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
@@ -47,9 +55,11 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
 }
 
 // Hàm đóng SDL
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture)
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture)
 {
     SDL_DestroyTexture(backTexture);
+    SDL_DestroyTexture(characterTexture);
+    SDL_DestroyTexture(itemTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -73,15 +83,36 @@ int main(int argc, char* args[]) {
     }
 
     SDL_Texture* backTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-    SDL_FreeSurface(loadedSurface); // Chỉ giải phóng surface sau khi tạo texture
+    SDL_FreeSurface(loadedSurface);
     if (!backTexture) {
         cout << "Failed to create texture! SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
 
-    // Vị trí ban đầu của nhân vật
-    int characterPosX = (SCREEN_WIDTH - CHARACTER_WIDTH) / 2;
-    int characterPosY = SCREEN_HEIGHT - CHARACTER_HEIGHT - 50;
+    SDL_Surface* loadedCharacter = IMG_Load("bop.png");
+    if (!loadedCharacter) {
+        cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
+        return -1;
+    }
+    SDL_Texture* characterTexture = SDL_CreateTextureFromSurface(renderer, loadedCharacter);
+    SDL_FreeSurface(loadedCharacter);
+    if (!characterTexture) {
+        cout << "Failed to create texture! SDL_Error: " << SDL_GetError() << endl;
+        return -1;
+    }
+    
+    // Image cho item
+    SDL_Surface* loadedItem = IMG_Load("dh.png");
+    if (!loadedItem) {
+        cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
+        return -1;
+    }
+    SDL_Texture* itemTexture = SDL_CreateTextureFromSurface(renderer, loadedItem);
+    SDL_FreeSurface(loadedItem);
+    if (!itemTexture) {
+        cout << "Failed to create texture! SDL_Error: " << SDL_GetError() << endl;
+        return -1;
+    }
 
     bool quit = false;
     SDL_Event e;
@@ -115,20 +146,24 @@ int main(int argc, char* args[]) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, backTexture, NULL, NULL);
 
-        // Vẽ nhân vật
-        SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &character);
+        // Vẽ PlatformPlatform
+        SDL_Rect platform = {platformPosX, platformPosY, PLATFORM_WIDTH, PLATFORM_HEIGHT};
+        SDL_SetRenderDrawColor(renderer, 124, 252, 0, 255);
+        SDL_RenderFillRect(renderer, &platform);
 
         // Vẽ item
         SDL_Rect item = {itemPosX, itemPosY, ITEM_WIDTH, ITEM_HEIGHT};
-        SDL_SetRenderDrawColor(renderer, 100, 23, 104, 255);
-        SDL_RenderFillRect(renderer, &item);
+        SDL_RenderCopy(renderer, itemTexture, NULL, &item);
+        
+        // Vẽ nhân vật
+        SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
+        SDL_RenderCopy(renderer, characterTexture, NULL, &character);
+
 
         SDL_RenderPresent(renderer);
         SDL_Delay(8);
     }
 
-    close(window, renderer, backTexture);
+    close(window, renderer, backTexture, characterTexture, itemTexture);
     return 0;
 }
