@@ -70,16 +70,16 @@ int main(int argc, char* args[]) {
             characterPosX += 1;
         }
 
-        // màu nền
+        // Màu nền
         SDL_SetRenderDrawColor(renderer, 135, 206, 235, 255);
         SDL_RenderClear(renderer);
 
-        // màu mặt đất
+        // Màu mặt đất
         SDL_Rect platform = {0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 50};
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_RenderFillRect(renderer, &platform);
 
-        // màu nhân vật
+        // Màu nhân vật
         SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &character);
