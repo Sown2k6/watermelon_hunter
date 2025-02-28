@@ -1,13 +1,16 @@
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <random>
 
 using namespace std;
 
+
+// Kích thước màn hình
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
 // Kích thước nhân vật
-const int CHARACTER_WIDTH = 50;
+const int CHARACTER_WIDTH = 30;
 const int CHARACTER_HEIGHT = 50;
 
 // Hàm khởi tạo SDL
@@ -49,42 +52,73 @@ int main(int argc, char* args[]) {
     }
 
     // Vị trí ban đầu của nhân vật
-    int characterPosX = (SCREEN_WIDTH - CHARACTER_WIDTH) / 2;
-    int characterPosY = SCREEN_HEIGHT - CHARACTER_HEIGHT - 50;
+    float characterPosX = 385;
+    float characterPosY = 500;
+
+    // Thông số item
+    float itemPosX = 400;
+    float itemPosY = 300;
+    const int ITEM_WIDTH = 30;
+    const int ITEM_HEIGHT = 30;
+
 
     bool quit = false;
     SDL_Event e;
 
-    while (!quit) {
-        while (SDL_PollEvent(&e) != 0) {
+    while (!quit)
+    {
+        itemPosY += 6;
+            if (itemPosY >= 600)
+            {
+                itemPosY = 0;
+                random_device rd;
+                mt19937 gen(rd());
+                uniform_real_distribution<double> dist(0, 570);
+                double RandomItemPosX = dist(gen);
+                itemPosX = RandomItemPosX;
+            }
+        while (SDL_PollEvent(&e) != 0)
+        {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
         }
 
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-        if (currentKeyStates[SDL_SCANCODE_A]) {
-            characterPosX -= 1;
+        /*if (currentKeyStates[SDL_SCANCODE_W])
+        {
+            characterPosY -= 1;
+        }*/
+        if (currentKeyStates[SDL_SCANCODE_A])
+        {
+            characterPosX -= 8;
         }
-        if (currentKeyStates[SDL_SCANCODE_D]) {
-            characterPosX += 1;
+        if (currentKeyStates[SDL_SCANCODE_D])
+        {
+            characterPosX += 8;
         }
 
-        // màu nền
+        // Màu nền
         SDL_SetRenderDrawColor(renderer, 135, 206, 235, 255);
         SDL_RenderClear(renderer);
 
-        // màu mặt đất
+        // Màu mặt đất
         SDL_Rect platform = {0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 50};
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_RenderFillRect(renderer, &platform);
 
-        // màu nhân vật
-        SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
+        // Màu nhân vật
+        SDL_Rect character = {(int)characterPosX, (int)characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &character);
 
+        // Item
+        SDL_Rect item = {(int)itemPosX, (int)itemPosY, ITEM_WIDTH, ITEM_HEIGHT};
+        SDL_SetRenderDrawColor(renderer, 138, 43, 226, 1);
+        SDL_RenderFillRect(renderer, &item);
+
         SDL_RenderPresent(renderer);
+        SDL_Delay(8);
     }
 
     close(window, renderer);
