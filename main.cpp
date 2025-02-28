@@ -4,14 +4,19 @@
 
 using namespace std;
 
-
 // Kích thước màn hình
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
 // Kích thước nhân vật
-const int CHARACTER_WIDTH = 30;
+const int CHARACTER_WIDTH = 50;
 const int CHARACTER_HEIGHT = 50;
+
+// Thông số item
+const int ITEM_WIDTH = 30;
+const int ITEM_HEIGHT = 30;
+int itemPosX = 400;
+int itemPosY = 300;
 
 // Hàm khởi tạo SDL
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
@@ -52,49 +57,37 @@ int main(int argc, char* args[]) {
     }
 
     // Vị trí ban đầu của nhân vật
-    float characterPosX = 385;
-    float characterPosY = 500;
-
-    // Thông số item
-    float itemPosX = 400;
-    float itemPosY = 300;
-    const int ITEM_WIDTH = 30;
-    const int ITEM_HEIGHT = 30;
-
+    int characterPosX = (SCREEN_WIDTH - CHARACTER_WIDTH) / 2;
+    int characterPosY = SCREEN_HEIGHT - CHARACTER_HEIGHT - 50;
 
     bool quit = false;
     SDL_Event e;
 
-    while (!quit)
-    {
-        itemPosY += 6;
+    while (!quit) {
+
+        // Falling item
+            itemPosY += 6;
             if (itemPosY >= 600)
             {
                 itemPosY = 0;
-                random_device rd;
-                mt19937 gen(rd());
-                uniform_real_distribution<double> dist(0, 570);
-                double RandomItemPosX = dist(gen);
-                itemPosX = RandomItemPosX;
+                static random_device rd;
+                static mt19937 gen(rd());
+                uniform_int_distribution<int> dist(0, 770);
+                itemPosX = dist(gen);
+
             }
-        while (SDL_PollEvent(&e) != 0)
-        {
+
+        while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
         }
 
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-        /*if (currentKeyStates[SDL_SCANCODE_W])
-        {
-            characterPosY -= 1;
-        }*/
-        if (currentKeyStates[SDL_SCANCODE_A])
-        {
+        if (currentKeyStates[SDL_SCANCODE_A]) {
             characterPosX -= 8;
         }
-        if (currentKeyStates[SDL_SCANCODE_D])
-        {
+        if (currentKeyStates[SDL_SCANCODE_D]) {
             characterPosX += 8;
         }
 
@@ -108,16 +101,17 @@ int main(int argc, char* args[]) {
         SDL_RenderFillRect(renderer, &platform);
 
         // Màu nhân vật
-        SDL_Rect character = {(int)characterPosX, (int)characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
+        SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &character);
 
-        // Item
-        SDL_Rect item = {(int)itemPosX, (int)itemPosY, ITEM_WIDTH, ITEM_HEIGHT};
-        SDL_SetRenderDrawColor(renderer, 138, 43, 226, 1);
+        // Màu item
+        SDL_Rect item = {itemPosX, itemPosY, ITEM_WIDTH, ITEM_HEIGHT};
+        SDL_SetRenderDrawColor(renderer, 100, 23, 104, 1);
         SDL_RenderFillRect(renderer, &item);
 
         SDL_RenderPresent(renderer);
+
         SDL_Delay(8);
     }
 
