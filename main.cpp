@@ -81,7 +81,6 @@ int main(int argc, char* args[]) {
         cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
         return -1;
     }
-
     SDL_Texture* backTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
     SDL_FreeSurface(loadedSurface);
     if (!backTexture) {
@@ -89,6 +88,7 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
+    // Load hình nhân vật
     SDL_Surface* loadedCharacter = IMG_Load("bop.png");
     if (!loadedCharacter) {
         cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
@@ -101,7 +101,7 @@ int main(int argc, char* args[]) {
         return -1;
     }
     
-    // Image cho item
+    // Load hình item
     SDL_Surface* loadedItem = IMG_Load("dh.png");
     if (!loadedItem) {
         cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
