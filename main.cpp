@@ -27,6 +27,9 @@ const int PLATFORM_HEIGHT = 75;
 const int platformPosX = 0;
 const int platformPosY = 525;
 
+// All functions
+bool Collision(SDL_Rect a, SDL_Rect b);
+
 // Khởi tạo
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -117,9 +120,11 @@ int main(int argc, char* args[]) {
     bool quit = false;
     SDL_Event e;
 
+    int score = 0;
+
     while (!quit) {
         // Falling item
-        itemPosY += 6;
+        itemPosY += 3;
         if (itemPosY >= SCREEN_HEIGHT) {
             itemPosY = 0;
             static random_device rd;
@@ -135,10 +140,10 @@ int main(int argc, char* args[]) {
         }
 
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-        if (currentKeyStates[SDL_SCANCODE_A]) {
+        if (currentKeyStates[SDL_SCANCODE_A] && characterPosX >= 0) {
             characterPosX -= 8;
         }
-        if (currentKeyStates[SDL_SCANCODE_D]) {
+        if (currentKeyStates[SDL_SCANCODE_D] && characterPosX + CHARACTER_WIDTH <= SCREEN_WIDTH) {
             characterPosX += 8;
         }
 
@@ -159,6 +164,17 @@ int main(int argc, char* args[]) {
         SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_RenderCopy(renderer, characterTexture, NULL, &character);
 
+        // Check collision
+        if (Collision(character, item))
+        {
+            itemPosY = 0;
+            static random_device rd;
+            static mt19937 gen(rd());
+            uniform_int_distribution<int> dist(0, SCREEN_WIDTH - ITEM_WIDTH);
+            itemPosX = dist(gen);
+
+            score++;
+        }
 
         SDL_RenderPresent(renderer);
         SDL_Delay(8);
@@ -166,4 +182,17 @@ int main(int argc, char* args[]) {
 
     close(window, renderer, backTexture, characterTexture, itemTexture);
     return 0;
+}
+bool Collision(SDL_Rect a, SDL_Rect b)
+{
+    if ((a.x + a.w >= b.x) && (a.x <= b.x + b.w))
+    {
+        if ((a.y + a.h >= b.y) && (a.y <= b.y + b.h))
+        {
+            return true;
+        }
+        else return false;
+        
+    }
+    else return false;
 }
