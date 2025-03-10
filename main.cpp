@@ -121,6 +121,7 @@ int main(int argc, char* args[]) {
     SDL_Event e;
 
     int score = 0;
+    int lives = 5;
 
     while (!quit) {
         // Falling item
@@ -131,6 +132,7 @@ int main(int argc, char* args[]) {
             static mt19937 gen(rd());
             uniform_int_distribution<int> dist(0, SCREEN_WIDTH - ITEM_WIDTH);
             itemPosX = dist(gen);
+            lives--;
         }
 
         while (SDL_PollEvent(&e) != 0) {
@@ -172,8 +174,9 @@ int main(int argc, char* args[]) {
             static mt19937 gen(rd());
             uniform_int_distribution<int> dist(0, SCREEN_WIDTH - ITEM_WIDTH);
             itemPosX = dist(gen);
-
             score++;
+
+            cout << score << " " << lives << endl;
         }
 
         SDL_RenderPresent(renderer);
