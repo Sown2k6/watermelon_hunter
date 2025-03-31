@@ -96,7 +96,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load hình ảnh nền
-    SDL_Surface* loadedSurface = IMG_Load("landscape.jpg");
+    SDL_Surface* loadedSurface = IMG_Load("Game_Resources/landscape.jpg");
     if (!loadedSurface) {
         cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -109,7 +109,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load hình nhân vật
-    SDL_Surface* loadedCharacter = IMG_Load("bop.png");
+    SDL_Surface* loadedCharacter = IMG_Load("Game_Resources/bop.png");
     if (!loadedCharacter) {
         cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -122,7 +122,7 @@ int main(int argc, char* args[]) {
     }
     
     // Load hình item
-    SDL_Surface* loadedItem = IMG_Load("dh.png");
+    SDL_Surface* loadedItem = IMG_Load("Game_Resources/dh.png");
     if (!loadedItem) {
         cout << "Failed to load image! IMG_Error: " << IMG_GetError() << endl;
         return -1;
