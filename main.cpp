@@ -1,4 +1,5 @@
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <random>
@@ -14,18 +15,25 @@ const int CHARACTER_WIDTH = 40;
 const int CHARACTER_HEIGHT = 50;
 int characterPosX =  380;
 int characterPosY = 500;
+int characterSpeed = 5;
+int scores = 0;
+int lives = 5;
 
 // Thông số item
 const int ITEM_WIDTH = 30;
 const int ITEM_HEIGHT = 30;
 int itemPosX = 400;
 int itemPosY = 300;
+int ItemSpeed = 3;
+int PointToSpeedUp = 10;
 
 // Platform
 const int PLATFORM_WIDTH = 800;
 const int PLATFORM_HEIGHT = 75;
 const int platformPosX = 0;
 const int platformPosY = 525;
+
+
 
 // All functions
 bool Collision(SDL_Rect a, SDL_Rect b);
@@ -37,7 +45,7 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
         return false;
     }
 
-    window = SDL_CreateWindow("Word Catcher", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("WaterMelon", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         cout << "Window could not be created! SDL_Error: " << SDL_GetError() << endl;
         return false;
@@ -53,14 +61,21 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
         cout << "SDL_image could not initialize! IMG_Error: " << IMG_GetError() << endl;
         return false;
     }
-
+    
+    if (TTF_Init() == -1) {
+        cout << "SDL_ttf không thể khởi tạo! Lỗi: " << TTF_GetError() << endl;
+        return -1;
+    }
     return true;
 }
 
+
+
 // Hàm đóng SDL
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture)
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* YourScores_Texture)
 {
     SDL_DestroyTexture(backTexture);
+    SDL_DestroyTexture(YourScores_Texture);
     SDL_DestroyTexture(characterTexture);
     SDL_DestroyTexture(itemTexture);
     SDL_DestroyRenderer(renderer);
@@ -68,8 +83,10 @@ void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture,
     SDL_Quit();
 }
 
+SDL_Texture* YourScores_Texture;
 
 int main(int argc, char* args[]) {
+
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
 
@@ -117,15 +134,51 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
+    // Load font
+    TTF_Font* MinecraftFont = TTF_OpenFont("Minecraft.ttf", 48);
+    if (!MinecraftFont) {
+       cout << "Không thể load font! Lỗi: " << TTF_GetError() << endl;
+       return -1;
+    }
+
+    // Tạo màu chữ (black)
+    SDL_Color textColor = {0, 0, 0, 255};
+
+    // Render text thành texture
+    /*SDL_Surface* YourScores_Surface = TTF_RenderText_Solid(MinecraftFont, ("Your scores: " + to_string(scores)).c_str(), textColor);
+    if (!YourScores_Surface) {
+        cout << "Không thể tạo surface từ text! Lỗi: " << TTF_GetError() << endl;
+        return -1;
+    }*/
+    SDL_Surface* GameOver_Surface = TTF_RenderText_Solid(MinecraftFont, "Game Over!", textColor);
+    if (!GameOver_Surface) {
+        cout << "Không thể tạo surface từ text! Lỗi: " << TTF_GetError() << endl;
+        return -1;
+    }
+
+//SDL_Texture* YourScores_Texture = SDL_CreateTextureFromSurface(renderer, YourScores_Surface);
+//SDL_FreeSurface(YourScores_Surface);
+SDL_Texture* GameOver_Texture = SDL_CreateTextureFromSurface(renderer, GameOver_Surface);
+SDL_FreeSurface(GameOver_Surface);
+
+   // Xác định vị trí hiển thị chữ
+SDL_Rect ScoresRect = {10, 10, 300, 50};
+SDL_Rect GameOverRect = {250, 230, 270, 140};
+
+    
     bool quit = false;
     SDL_Event e;
 
-    int score = 0;
-    int lives = 5;
-
+// Vong Lap O Day
     while (!quit) {
         // Falling item
-        itemPosY += 3;
+        itemPosY += ItemSpeed;
+        if (scores == PointToSpeedUp)
+        {
+            ItemSpeed++;
+            PointToSpeedUp += 10;
+
+        }
         if (itemPosY >= SCREEN_HEIGHT) {
             itemPosY = 0;
             static random_device rd;
@@ -143,10 +196,10 @@ int main(int argc, char* args[]) {
 
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
         if (currentKeyStates[SDL_SCANCODE_A] && characterPosX >= 0) {
-            characterPosX -= 8;
+            characterPosX -= characterSpeed;
         }
         if (currentKeyStates[SDL_SCANCODE_D] && characterPosX + CHARACTER_WIDTH <= SCREEN_WIDTH) {
-            characterPosX += 8;
+            characterPosX += characterSpeed;
         }
 
         // Xóa màn hình và vẽ background
@@ -166,6 +219,24 @@ int main(int argc, char* args[]) {
         SDL_Rect character = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_RenderCopy(renderer, characterTexture, NULL, &character);
 
+        // Cập nhật điểm số
+        SDL_Surface* YourScores_Surface = TTF_RenderText_Solid(MinecraftFont, ("Your scores: " + to_string(scores)).c_str(), textColor);
+        if (!YourScores_Surface) {
+            cout << "Không thể tạo surface từ text! Lỗi: " << TTF_GetError() << endl;
+            return -1;
+        }
+        YourScores_Texture = SDL_CreateTextureFromSurface(renderer, YourScores_Surface);
+        SDL_FreeSurface(YourScores_Surface);
+
+        // Vẽ chữ lên màn hình
+        SDL_RenderCopy(renderer, YourScores_Texture, NULL, &ScoresRect);
+        if (lives <= 0)
+        {
+            SDL_RenderCopy(renderer, GameOver_Texture, NULL, &GameOverRect);
+            ItemSpeed = 0;
+            characterSpeed = 0;
+        }
+
         // Check collision
         if (Collision(character, item))
         {
@@ -174,18 +245,22 @@ int main(int argc, char* args[]) {
             static mt19937 gen(rd());
             uniform_int_distribution<int> dist(0, SCREEN_WIDTH - ITEM_WIDTH);
             itemPosX = dist(gen);
-            score++;
+            scores++;
 
-            cout << score << " " << lives << endl;
+            if (lives > 0) cout << "Scores: " << scores << ". Lives: " << lives << endl;
+            else cout << "Gameover !" << endl;
         }
 
         SDL_RenderPresent(renderer);
         SDL_Delay(8);
     }
 
-    close(window, renderer, backTexture, characterTexture, itemTexture);
+    close(window, renderer, backTexture, characterTexture, itemTexture, YourScores_Texture);
     return 0;
 }
+
+
+// All Functions
 bool Collision(SDL_Rect a, SDL_Rect b)
 {
     if ((a.x + a.w >= b.x) && (a.x <= b.x + b.w))

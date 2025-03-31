@@ -3,11 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "C:/Users/ADMIN/OneDrive/Máy tính/SDL2-2.32.0/x86_64-w64-mingw32/include",
-                "C:\\Users\\ADMIN\\OneDrive\\Máy tính\\SDL2_image-2.8.5\\x86_64-w64-mingw32\\include",
-                "C:/Users/ADMIN/OneDrive/Máy tính/SDL2-2.32.0/x86_64-w64-mingw32/include/SDL2",
-                "C:/Users/ADMIN/OneDrive/Máy tính/SDL2_image-2.8.5/x86_64-w64-mingw32/include/SDL2"
+            "${workspaceFolder}/**",
+                
             ],
             "defines": [
                 "_DEBUG",
