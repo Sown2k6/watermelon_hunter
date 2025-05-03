@@ -1,17 +1,17 @@
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL.h>
 #include <iostream>
 #include <random>
 #include <string>
 
 using namespace std;
 
-// kích thước màn hình
+// Screen size
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
-// Thông số nhân vật
+// Character
 const int CHARACTER_WIDTH = 40;
 const int CHARACTER_HEIGHT = 50;
 int characterPosX = 380;
@@ -20,7 +20,7 @@ int characterSpeed = 8;
 int scores = 0;
 int lives = 3;
 
-// Thông số item
+// Item
 const int ITEM_WIDTH = 30;
 const int ITEM_HEIGHT = 30;
 int itemPosX = 400;
@@ -38,7 +38,7 @@ int enemyspeed = 5;
 // All functions
 bool Collision(SDL_Rect a, SDL_Rect b);
 
-// Khởi tạo
+// Initialize
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
@@ -69,7 +69,7 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
     return true;
 }
 
-// Hàm đóng SDL
+// Close SDL Function
 void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* platformTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture)
 {
     SDL_DestroyTexture(backTexture);
@@ -96,21 +96,21 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
-    // Load hình ảnh nền
-    SDL_Surface* loadedSurface = IMG_Load("Game_Resources/landscape.jpg");
-    if (!loadedSurface) {
+    // Load background
+    SDL_Surface* BackgroundSurface = IMG_Load("assets/landscape.jpg");
+    if (!BackgroundSurface) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
     }
-    SDL_Texture* backTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-    SDL_FreeSurface(loadedSurface);
-    if (!backTexture) {
+    SDL_Texture* BackgroundTexture = SDL_CreateTextureFromSurface(renderer, BackgroundSurface);
+    SDL_FreeSurface(BackgroundSurface);
+    if (!BackgroundTexture) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
 
-    // Load hình nhân vật
-    SDL_Surface* loadedCharacter = IMG_Load("Game_Resources/bop.png");
+    // Load character
+    SDL_Surface* loadedCharacter = IMG_Load("assets/bop.png");
     if (!loadedCharacter) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -122,8 +122,8 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
-    // Load hình item
-    SDL_Surface* loadedItem = IMG_Load("Game_Resources/dh.png");
+    // Load item
+    SDL_Surface* loadedItem = IMG_Load("assets/dh.png");
     if (!loadedItem) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -135,8 +135,8 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
-    // Load hình platform (skeleton)
-    SDL_Surface* loadedPlatform = IMG_Load("Game_Resources/skeleton.png");
+    // Load enemy
+    SDL_Surface* loadedPlatform = IMG_Load("assets/skeleton.png");
     if (!loadedPlatform) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -155,7 +155,7 @@ int main(int argc, char* args[]) {
        return -1;
     }
 
-    // Tạo màu chữ (black)
+    // Colour black
     SDL_Color textColor = {0, 0, 0, 255};
 
     SDL_Surface* GameOver_Surface = TTF_RenderText_Solid(MinecraftFont, "Game Over!", textColor);
@@ -167,15 +167,15 @@ int main(int argc, char* args[]) {
 GameOver_Texture = SDL_CreateTextureFromSurface(renderer, GameOver_Surface);
 SDL_FreeSurface(GameOver_Surface);
 
-   // Xác định vị trí hiển thị chữ
+   // Letter position
 SDL_Rect ScoresRect = {10, 10, 300, 50};
 SDL_Rect GameOverRect = {250, 230, 270, 140};
 
     bool quit = false;
     SDL_Event e;
-    bool isJKeyPressed = false; // Biến theo dõi trạng thái phím J
+    bool isJKeyPressed = false;
 
-// Vòng Lặp Chính
+// Main loop
     while (!quit) {
         // Falling item
         itemPosY += ItemSpeed;
@@ -220,7 +220,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
 
         // Xóa màn hình và vẽ background
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, backTexture, NULL, NULL);
+        SDL_RenderCopy(renderer, BackgroundTexture, NULL, NULL);
 
         // Vẽ Platform bằng hình ảnh
         SDL_Rect platformRect = {platformPosX, platformPosY, PLATFORM_WIDTH, PLATFORM_HEIGHT};
@@ -280,7 +280,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         SDL_Delay(12);
     }
 
-    close(window, renderer, backTexture, characterTexture, itemTexture, platformTexture, YourScores_Texture, GameOver_Texture);
+    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, platformTexture, YourScores_Texture, GameOver_Texture);
     return 0;
 }
 
