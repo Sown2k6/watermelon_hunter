@@ -29,10 +29,10 @@ int ItemSpeed = 3;
 int PointToSpeedUp = 10;
 
 // Enemy
-const int PLATFORM_WIDTH = 40;
-const int PLATFORM_HEIGHT = 50;
-int platformPosX = 0;
-int platformPosY = 500;
+const int ENEMY_WIDTH = 40;
+const int ENEMY_HEIGHT = 50;
+int EnemyPosX = 0;
+int EnemyPosY = 500;
 int enemyspeed = 5;
 
 // All functions
@@ -136,14 +136,14 @@ int main(int argc, char* args[]) {
     }
 
     // Load enemy
-    SDL_Surface* loadedPlatform = IMG_Load("assets/skeleton.png");
-    if (!loadedPlatform) {
+    SDL_Surface* EnemySurface = IMG_Load("assets/skeleton.png");
+    if (!EnemySurface) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
     }
-    SDL_Texture* platformTexture = SDL_CreateTextureFromSurface(renderer, loadedPlatform);
-    SDL_FreeSurface(loadedPlatform);
-    if (!platformTexture) {
+    SDL_Texture* EnemyTexture = SDL_CreateTextureFromSurface(renderer, EnemySurface);
+    SDL_FreeSurface(EnemySurface);
+    if (!EnemyTexture) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
@@ -202,8 +202,8 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
                     if (!isJKeyPressed) {
                         // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
                         int tempX = characterPosX;
-                        characterPosX = platformPosX;
-                        platformPosX = tempX;
+                        characterPosX = EnemyPosX;
+                        EnemyPosX = tempX;
                         isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
                     }
                 }
@@ -214,27 +214,27 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
             }
         }
         // Moving Enemy
-        platformPosX += enemyspeed;
-        if (platformPosX >= 760) enemyspeed = -5;
-        if (platformPosX <= 0) enemyspeed = 5;
+        EnemyPosX += enemyspeed;
+        if (EnemyPosX >= 760) enemyspeed = -5;
+        if (EnemyPosX <= 0) enemyspeed = 5;
 
         // Xóa màn hình và vẽ background
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, BackgroundTexture, NULL, NULL);
 
-        // Vẽ Platform bằng hình ảnh
-        SDL_Rect platformRect = {platformPosX, platformPosY, PLATFORM_WIDTH, PLATFORM_HEIGHT};
-        SDL_RenderCopy(renderer, platformTexture, NULL, &platformRect);
+        // Render enemy
+        SDL_Rect EnemyRect = {EnemyPosX, EnemyPosY, ENEMY_WIDTH, ENEMY_HEIGHT};
+        SDL_RenderCopy(renderer, EnemyTexture, NULL, &EnemyRect);
 
-        // Vẽ item
+        // Render item
         SDL_Rect itemRect = {itemPosX, itemPosY, ITEM_WIDTH, ITEM_HEIGHT};
         SDL_RenderCopy(renderer, itemTexture, NULL, &itemRect);
 
-        // Vẽ nhân vật
+        // Render character
         SDL_Rect characterRect = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_RenderCopy(renderer, characterTexture, NULL, &characterRect);
 
-        // Cập nhật điểm số
+        // Update scores
         SDL_Surface* YourScores_Surface = TTF_RenderText_Solid(MinecraftFont, ("Your scores: " + to_string(scores)).c_str(), textColor);
         if (!YourScores_Surface) {
             cout << "ERROR" << TTF_GetError() << endl;
@@ -243,7 +243,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         YourScores_Texture = SDL_CreateTextureFromSurface(renderer, YourScores_Surface);
         SDL_FreeSurface(YourScores_Surface);
 
-        // Vẽ chữ lên màn hình
+        // Render words
         SDL_RenderCopy(renderer, YourScores_Texture, NULL, &ScoresRect);
         if (lives <= 0)
         {
@@ -271,7 +271,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         if (currentKeyStates[SDL_SCANCODE_D] && characterPosX + CHARACTER_WIDTH <= SCREEN_WIDTH) {
             characterPosX += characterSpeed;
         }
-        if (Collision(characterRect, platformRect))
+        if (Collision(characterRect, EnemyRect))
         {
             lives = 0;
         }
@@ -280,7 +280,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         SDL_Delay(12);
     }
 
-    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, platformTexture, YourScores_Texture, GameOver_Texture);
+    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, GameOver_Texture);
     return 0;
 }
 
