@@ -96,6 +96,19 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
+    // Load menu
+    SDL_Surface* MenuSurface = IMG_Load("assets/menu.png");
+    if (!MenuSurface) {
+        cout << "IMG_Error: " << IMG_GetError() << endl;
+        return -1;
+    }
+    SDL_Texture* MenuTexture = SDL_CreateTextureFromSurface(renderer, MenuSurface);
+    SDL_FreeSurface(MenuSurface);
+    if (!MenuTexture) {
+        cout << "SDL_Error: " << SDL_GetError() << endl;
+        return -1;
+    }
+
     // Load background
     SDL_Surface* BackgroundSurface = IMG_Load("assets/landscape.jpg");
     if (!BackgroundSurface) {
