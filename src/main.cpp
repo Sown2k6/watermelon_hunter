@@ -14,8 +14,8 @@ const int SCREEN_HEIGHT = 600;
 // Character
 const int CHARACTER_WIDTH = 40;
 const int CHARACTER_HEIGHT = 50;
-int characterPosX = 380;
-int characterPosY = 500;
+int CharacterPosX = 380;
+int CharacterPosY = 500;
 int characterSpeed = 8;
 int scores = 0;
 int lives = 3;
@@ -23,8 +23,8 @@ int lives = 3;
 // Item
 const int ITEM_WIDTH = 30;
 const int ITEM_HEIGHT = 30;
-int itemPosX = 400;
-int itemPosY = 300;
+int ItemPosX = 400;
+int ItemPosY = 300;
 int ItemSpeed = 3;
 int PointToSpeedUp = 10;
 
@@ -178,19 +178,19 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
 // Main loop
     while (!quit) {
         // Falling item
-        itemPosY += ItemSpeed;
+        ItemPosY += ItemSpeed;
         if (scores == PointToSpeedUp)
         {
             ItemSpeed++;
             PointToSpeedUp += 10;
 
         }
-        if (itemPosY >= SCREEN_HEIGHT) {
-            itemPosY = 0;
+        if (ItemPosY >= SCREEN_HEIGHT) {
+            ItemPosY = 0;
             static random_device rd;
             static mt19937 gen(rd());
             uniform_int_distribution<int> dist(0, SCREEN_WIDTH - ITEM_WIDTH);
-            itemPosX = dist(gen);
+            ItemPosX = dist(gen);
             lives--;
         }
 
@@ -201,8 +201,8 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
                 if (e.key.keysym.sym == SDLK_j) {
                     if (!isJKeyPressed) {
                         // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
-                        int tempX = characterPosX;
-                        characterPosX = EnemyPosX;
+                        int tempX = CharacterPosX;
+                        CharacterPosX = EnemyPosX;
                         EnemyPosX = tempX;
                         isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
                     }
@@ -218,7 +218,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         if (EnemyPosX >= 760) enemyspeed = -5;
         if (EnemyPosX <= 0) enemyspeed = 5;
 
-        // Xóa màn hình và vẽ background
+        // Render background
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, BackgroundTexture, NULL, NULL);
 
@@ -227,11 +227,11 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         SDL_RenderCopy(renderer, EnemyTexture, NULL, &EnemyRect);
 
         // Render item
-        SDL_Rect itemRect = {itemPosX, itemPosY, ITEM_WIDTH, ITEM_HEIGHT};
+        SDL_Rect itemRect = {ItemPosX, ItemPosY, ITEM_WIDTH, ITEM_HEIGHT};
         SDL_RenderCopy(renderer, itemTexture, NULL, &itemRect);
 
         // Render character
-        SDL_Rect characterRect = {characterPosX, characterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
+        SDL_Rect characterRect = {CharacterPosX, CharacterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_RenderCopy(renderer, characterTexture, NULL, &characterRect);
 
         // Update scores
@@ -256,20 +256,20 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         // Check collision
         if (Collision(characterRect, itemRect))
         {
-            itemPosY = 0;
+            ItemPosY = 0;
             static random_device rd;
             static mt19937 gen(rd());
             uniform_int_distribution<int> dist(0, SCREEN_WIDTH - ITEM_WIDTH);
-            itemPosX = dist(gen);
+            ItemPosX = dist(gen);
             scores++;
         }
 
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-        if (currentKeyStates[SDL_SCANCODE_A] && characterPosX >= 0) {
-            characterPosX -= characterSpeed;
+        if (currentKeyStates[SDL_SCANCODE_A] && CharacterPosX >= 0) {
+            CharacterPosX -= characterSpeed;
         }
-        if (currentKeyStates[SDL_SCANCODE_D] && characterPosX + CHARACTER_WIDTH <= SCREEN_WIDTH) {
-            characterPosX += characterSpeed;
+        if (currentKeyStates[SDL_SCANCODE_D] && CharacterPosX + CHARACTER_WIDTH <= SCREEN_WIDTH) {
+            CharacterPosX += characterSpeed;
         }
         if (Collision(characterRect, EnemyRect))
         {
