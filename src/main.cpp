@@ -19,7 +19,7 @@ int CharacterPosX = 380;
 int CharacterPosY = 500;
 int characterSpeed = 8;
 int scores = 0;
-int lives = 3;
+int lives = 1;
 
 // Item
 const int ITEM_WIDTH = 30;
@@ -198,11 +198,12 @@ int main(int argc, char* args[]) {
     // Letter position
     SDL_Rect ScoresRect = {10, 10, 300, 50};
     SDL_Rect GameOverRect = {250, 230, 270, 140};
-
-    bool quit = false;
+    
     SDL_Event e;
     bool isJKeyPressed = false;
+    bool isSpaceKeyPressed = false;
     // Menu loop
+    bool quit = false;
     bool exitMenu = true;
     while(exitMenu)
     {
@@ -216,20 +217,21 @@ int main(int argc, char* args[]) {
                 if (e.key.keysym.sym == SDLK_j) {
                     if (!isJKeyPressed) {
                         // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
-                            exitMenu = false;
-                            isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
-                        }
-                    }
-                } else if (e.type == SDL_KEYUP) {
-                    if (e.key.keysym.sym == SDLK_j) {
-                        isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
+                        exitMenu = false;
+                        isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
                     }
                 }
+            } else if (e.type == SDL_KEYUP) {
+                if (e.key.keysym.sym == SDLK_j) {
+                    isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
+                }
             }
-
-            SDL_RenderPresent(renderer);
-            SDL_Delay(12);
+        }
+        
+        SDL_RenderPresent(renderer);
+        SDL_Delay(12);
     }   
+
     // Main loop
     while (!quit) {
         // Falling item
@@ -249,25 +251,26 @@ int main(int argc, char* args[]) {
             lives--;
         }
 
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                quit = true;
-            } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_j) {
-                    if (!isJKeyPressed) {
-                        // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
-                        int tempX = CharacterPosX;
-                        CharacterPosX = EnemyPosX;
-                        EnemyPosX = tempX;
-                        isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
-                    }
-                }
-            } else if (e.type == SDL_KEYUP) {
-                if (e.key.keysym.sym == SDLK_j) {
-                    isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
-                }
-            }
-        }
+        // while (SDL_PollEvent(&e) != 0) {
+        //     if (e.type == SDL_QUIT) {
+        //         quit = true;
+        //     } else if (e.type == SDL_KEYDOWN) {
+        //         if (e.key.keysym.sym == SDLK_j) {
+        //             if (!isJKeyPressed) {
+        //                 // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
+        //                 int tempX = CharacterPosX;
+        //                 CharacterPosX = EnemyPosX;
+        //                 EnemyPosX = tempX;
+        //                 isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
+        //             }
+        //         }
+        //     } else if (e.type == SDL_KEYUP) {
+        //         if (e.key.keysym.sym == SDLK_j) {
+        //             isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
+        //         }
+        //     }
+        // }
+
         // Moving Enemy
         EnemyPosX += enemyspeed;
         if (EnemyPosX >= 760) enemyspeed = -5;
@@ -305,9 +308,50 @@ int main(int argc, char* args[]) {
             SDL_RenderCopy(renderer, GameOver_Texture, NULL, &GameOverRect);
             ItemSpeed = 0;
             characterSpeed = 0;
-            enemyspeed = 0;
+            enemyspeed = 0;    
         }
         
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            } else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_j) {
+                    if (!isJKeyPressed) {
+                        // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
+                        int tempX = CharacterPosX;
+                        CharacterPosX = EnemyPosX;
+                        EnemyPosX = tempX;
+                        isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
+                    }
+                }
+                if (e.key.keysym.sym == SDLK_SPACE && lives <= 0) {
+                    if (!isSpaceKeyPressed) {
+                        // Thực hiện hành động đổi chỗ chỉ khi phím Space vừa được nhấn
+                        ItemPosX = 400;
+                        ItemPosY = 300;
+                        ItemSpeed = 3;
+                        CharacterPosX = 380;
+                        CharacterPosY = 500;
+                        characterSpeed = 8;
+                        scores = 0;
+                        lives = 1;
+                        EnemyPosX = 0;
+                        EnemyPosY = 500;
+                        enemyspeed = 5;
+                        isSpaceKeyPressed = true; // Đánh dấu là phím Space đang được nhấn
+                    }
+                }
+            } else if (e.type == SDL_KEYUP) {
+                if (e.key.keysym.sym == SDLK_SPACE) {
+                    isSpaceKeyPressed = false; // Đánh dấu là phím Space đã được nhả ra
+                }
+                if (e.key.keysym.sym == SDLK_j) {
+                    isJKeyPressed = false; // Đánh dấu là phím j đã được nhả ra
+                }
+
+            }
+        }
+
         // Check collision
         if (Collision(characterRect, itemRect))
         {
