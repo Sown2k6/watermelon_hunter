@@ -70,13 +70,14 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
 }
 
 // Close SDL Function
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* platformTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture)
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture, SDL_Texture* MenuTexture)
 {
     SDL_DestroyTexture(backTexture);
     SDL_DestroyTexture(YourScores_Texture);
     SDL_DestroyTexture(characterTexture);
     SDL_DestroyTexture(itemTexture);
-    SDL_DestroyTexture(platformTexture);
+    SDL_DestroyTexture(EnemyTexture);
+    SDL_DestroyTexture(MenuTexture);
     SDL_DestroyTexture(GameOver_Texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -187,6 +188,34 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
     bool quit = false;
     SDL_Event e;
     bool isJKeyPressed = false;
+// Menu loop
+    bool exitMenu = true;
+    while(exitMenu)
+        {
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, MenuTexture, NULL, NULL);
+
+            while (SDL_PollEvent(&e) != 0) {
+                if (e.type == SDL_QUIT) {
+                    quit = true;
+                } else if (e.type == SDL_KEYDOWN) {
+                    if (e.key.keysym.sym == SDLK_j) {
+                        if (!isJKeyPressed) {
+                            // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
+                            exitMenu = false;
+                            isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
+                        }
+                    }
+                } else if (e.type == SDL_KEYUP) {
+                    if (e.key.keysym.sym == SDLK_j) {
+                        isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
+                    }
+                }
+            }
+
+            SDL_RenderPresent(renderer);
+            SDL_Delay(12);
+        }
 
 // Main loop
     while (!quit) {
@@ -293,7 +322,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         SDL_Delay(12);
     }
 
-    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, GameOver_Texture);
+    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, GameOver_Texture, MenuTexture);
     return 0;
 }
 
