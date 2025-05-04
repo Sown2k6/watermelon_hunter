@@ -1,9 +1,10 @@
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <SDL_ttf.h>
-#include <SDL.h>
 #include <iostream>
 #include <random>
 #include <string>
+#include <SDL.h>
 
 using namespace std;
 
@@ -64,6 +65,10 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
 
     if (TTF_Init() == -1) {
         cout << "TTF_Error: " << TTF_GetError() << endl;
+        return -1;
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        cout << "MIX_Error: " << Mix_GetError() << endl;
         return -1;
     }
     return true;
@@ -165,8 +170,29 @@ int main(int argc, char* args[]) {
     // Load font
     TTF_Font* MinecraftFont = TTF_OpenFont("assets/fonts/Minecraft.ttf", 48);
     if (!MinecraftFont) {
-       cout << "TTF_ERROR" << TTF_GetError() << endl;
+       cout << "TTF_ERROR: " << TTF_GetError() << endl;
        return -1;
+    }
+
+    // Load background music
+    Mix_Music* bgMusic = Mix_LoadMUS("assets/music/bgMusic.mp3");
+    if (!bgMusic)
+    {
+        cout << "MIX_Error: " << Mix_GetError() << endl;
+    }
+    Mix_VolumeMusic(15);
+    Mix_PlayMusic(bgMusic, -1);
+    // Load eating sound
+    Mix_Chunk* eatingSound = Mix_LoadWAV("assets/sound/eating.wav");
+    if (!eatingSound)
+    {
+        cout << "MIX_Error: " << Mix_GetError() << endl;
+    }
+    // Load damaged sound
+    Mix_Chunk* damagedSound = Mix_LoadWAV("assets/sound/damaged.mp3");
+    if (!damagedSound)
+    {
+        cout << "MIX_Error: " << Mix_GetError() << endl;
     }
 
     // Colour black
@@ -298,6 +324,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         // Check collision
         if (Collision(characterRect, itemRect))
         {
+            Mix_PlayChannel(-1, eatingSound, 0);
             ItemPosY = 0;
             static random_device rd;
             static mt19937 gen(rd());
@@ -316,6 +343,9 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         if (Collision(characterRect, EnemyRect))
         {
             lives = 0;
+            CharacterPosX = 1000;
+            CharacterPosY = 1000;
+            Mix_PlayChannel(-1, damagedSound, 0);
         }
 
         SDL_RenderPresent(renderer);
