@@ -38,6 +38,7 @@ int enemyspeed = 5;
 
 // All functions
 bool Collision(SDL_Rect a, SDL_Rect b);
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture, SDL_Texture* MenuTexture);
 
 // Initialize
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
@@ -74,34 +75,19 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
     return true;
 }
 
-// Close SDL Function
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture, SDL_Texture* MenuTexture)
-{
-    SDL_DestroyTexture(backTexture);
-    SDL_DestroyTexture(YourScores_Texture);
-    SDL_DestroyTexture(characterTexture);
-    SDL_DestroyTexture(itemTexture);
-    SDL_DestroyTexture(EnemyTexture);
-    SDL_DestroyTexture(MenuTexture);
-    SDL_DestroyTexture(GameOver_Texture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-}
-
 SDL_Texture* YourScores_Texture;
 SDL_Texture* GameOver_Texture;
 
 int main(int argc, char* args[]) {
-
+    
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
-
+    
     if (!init(window, renderer)) {
         cout << "Failed to initialize!" << endl;
         return -1;
     }
-
+    
     // Load menu
     SDL_Surface* MenuSurface = IMG_Load("assets/images/menu.png");
     if (!MenuSurface) {
@@ -114,7 +100,7 @@ int main(int argc, char* args[]) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
-
+    
     // Load background
     SDL_Surface* BackgroundSurface = IMG_Load("assets/images/landscape.jpg");
     if (!BackgroundSurface) {
@@ -127,7 +113,7 @@ int main(int argc, char* args[]) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
-
+    
     // Load character
     SDL_Surface* loadedCharacter = IMG_Load("assets/images/bop.png");
     if (!loadedCharacter) {
@@ -153,7 +139,7 @@ int main(int argc, char* args[]) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
-
+    
     // Load enemy
     SDL_Surface* EnemySurface = IMG_Load("assets/images/skeleton.png");
     if (!EnemySurface) {
@@ -166,20 +152,20 @@ int main(int argc, char* args[]) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
-
+    
     // Load font
     TTF_Font* MinecraftFont = TTF_OpenFont("assets/fonts/Minecraft.ttf", 48);
     if (!MinecraftFont) {
-       cout << "TTF_ERROR: " << TTF_GetError() << endl;
-       return -1;
+        cout << "TTF_ERROR: " << TTF_GetError() << endl;
+        return -1;
     }
-
+    
     // Load background music
     Mix_Music* bgMusic = Mix_LoadMUS("assets/music/bgMusic.mp3");
     if (!bgMusic)
     {
         cout << "MIX_Error: " << Mix_GetError() << endl;
-    }
+        return -1;    }
     Mix_VolumeMusic(15);
     Mix_PlayMusic(bgMusic, -1);
     // Load eating sound
@@ -187,47 +173,49 @@ int main(int argc, char* args[]) {
     if (!eatingSound)
     {
         cout << "MIX_Error: " << Mix_GetError() << endl;
+        return -1;
     }
     // Load damaged sound
     Mix_Chunk* damagedSound = Mix_LoadWAV("assets/sound/damaged.mp3");
     if (!damagedSound)
     {
         cout << "MIX_Error: " << Mix_GetError() << endl;
+        return -1;
     }
-
+    
     // Colour black
     SDL_Color textColor = {0, 0, 0, 255};
-
+    
     SDL_Surface* GameOver_Surface = TTF_RenderText_Solid(MinecraftFont, "Game Over!", textColor);
     if (!GameOver_Surface) {
         cout << "ERROR" << TTF_GetError() << endl;
         return -1;
     }
-
-GameOver_Texture = SDL_CreateTextureFromSurface(renderer, GameOver_Surface);
-SDL_FreeSurface(GameOver_Surface);
-
-   // Letter position
-SDL_Rect ScoresRect = {10, 10, 300, 50};
-SDL_Rect GameOverRect = {250, 230, 270, 140};
+    
+    GameOver_Texture = SDL_CreateTextureFromSurface(renderer, GameOver_Surface);
+    SDL_FreeSurface(GameOver_Surface);
+    
+    // Letter position
+    SDL_Rect ScoresRect = {10, 10, 300, 50};
+    SDL_Rect GameOverRect = {250, 230, 270, 140};
 
     bool quit = false;
     SDL_Event e;
     bool isJKeyPressed = false;
-// Menu loop
+    // Menu loop
     bool exitMenu = true;
     while(exitMenu)
-        {
-            SDL_RenderClear(renderer);
-            SDL_RenderCopy(renderer, MenuTexture, NULL, NULL);
-
-            while (SDL_PollEvent(&e) != 0) {
-                if (e.type == SDL_QUIT) {
-                    quit = true;
-                } else if (e.type == SDL_KEYDOWN) {
-                    if (e.key.keysym.sym == SDLK_j) {
-                        if (!isJKeyPressed) {
-                            // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
+    {
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, MenuTexture, NULL, NULL);
+        
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            } else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_j) {
+                    if (!isJKeyPressed) {
+                        // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
                             exitMenu = false;
                             isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
                         }
@@ -241,9 +229,8 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
 
             SDL_RenderPresent(renderer);
             SDL_Delay(12);
-        }
-
-// Main loop
+    }   
+    // Main loop
     while (!quit) {
         // Falling item
         ItemPosY += ItemSpeed;
@@ -251,7 +238,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         {
             ItemSpeed++;
             PointToSpeedUp += 10;
-
+            
         }
         if (ItemPosY >= SCREEN_HEIGHT) {
             ItemPosY = 0;
@@ -285,15 +272,15 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         EnemyPosX += enemyspeed;
         if (EnemyPosX >= 760) enemyspeed = -5;
         if (EnemyPosX <= 0) enemyspeed = 5;
-
+        
         // Render background
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, BackgroundTexture, NULL, NULL);
-
+        
         // Render enemy
         SDL_Rect EnemyRect = {EnemyPosX, EnemyPosY, ENEMY_WIDTH, ENEMY_HEIGHT};
         SDL_RenderCopy(renderer, EnemyTexture, NULL, &EnemyRect);
-
+        
         // Render item
         SDL_Rect itemRect = {ItemPosX, ItemPosY, ITEM_WIDTH, ITEM_HEIGHT};
         SDL_RenderCopy(renderer, itemTexture, NULL, &itemRect);
@@ -301,7 +288,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         // Render character
         SDL_Rect characterRect = {CharacterPosX, CharacterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_RenderCopy(renderer, characterTexture, NULL, &characterRect);
-
+        
         // Update scores
         SDL_Surface* YourScores_Surface = TTF_RenderText_Solid(MinecraftFont, ("Your scores: " + to_string(scores)).c_str(), textColor);
         if (!YourScores_Surface) {
@@ -310,7 +297,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
         }
         YourScores_Texture = SDL_CreateTextureFromSurface(renderer, YourScores_Surface);
         SDL_FreeSurface(YourScores_Surface);
-
+        
         // Render words
         SDL_RenderCopy(renderer, YourScores_Texture, NULL, &ScoresRect);
         if (lives <= 0)
@@ -320,7 +307,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
             characterSpeed = 0;
             enemyspeed = 0;
         }
-
+        
         // Check collision
         if (Collision(characterRect, itemRect))
         {
@@ -332,7 +319,7 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
             ItemPosX = dist(gen);
             scores++;
         }
-
+        
         const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
         if (currentKeyStates[SDL_SCANCODE_A] && CharacterPosX >= 0) {
             CharacterPosX -= characterSpeed;
@@ -348,14 +335,29 @@ SDL_Rect GameOverRect = {250, 230, 270, 140};
             Mix_PlayChannel(-1, damagedSound, 0);
         }
 
+
+        
         SDL_RenderPresent(renderer);
         SDL_Delay(12);
-    }
-
+        }
+        
     close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, GameOver_Texture, MenuTexture);
-    return 0;
+            return 0;
 }
 
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture, SDL_Texture* MenuTexture)
+{
+    SDL_DestroyTexture(backTexture);
+    SDL_DestroyTexture(YourScores_Texture);
+    SDL_DestroyTexture(characterTexture);
+    SDL_DestroyTexture(itemTexture);
+    SDL_DestroyTexture(EnemyTexture);
+    SDL_DestroyTexture(MenuTexture);
+    SDL_DestroyTexture(GameOver_Texture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
 
 // All Functions
 bool Collision(SDL_Rect a, SDL_Rect b)
