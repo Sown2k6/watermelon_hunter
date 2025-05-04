@@ -98,7 +98,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load menu
-    SDL_Surface* MenuSurface = IMG_Load("assets/menu.png");
+    SDL_Surface* MenuSurface = IMG_Load("assets/images/menu.png");
     if (!MenuSurface) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -111,7 +111,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load background
-    SDL_Surface* BackgroundSurface = IMG_Load("assets/landscape.jpg");
+    SDL_Surface* BackgroundSurface = IMG_Load("assets/images/landscape.jpg");
     if (!BackgroundSurface) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -124,7 +124,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load character
-    SDL_Surface* loadedCharacter = IMG_Load("assets/bop.png");
+    SDL_Surface* loadedCharacter = IMG_Load("assets/images/bop.png");
     if (!loadedCharacter) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -137,7 +137,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load item
-    SDL_Surface* loadedItem = IMG_Load("assets/dh.png");
+    SDL_Surface* loadedItem = IMG_Load("assets/images/dh.png");
     if (!loadedItem) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -150,7 +150,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load enemy
-    SDL_Surface* EnemySurface = IMG_Load("assets/skeleton.png");
+    SDL_Surface* EnemySurface = IMG_Load("assets/images/skeleton.png");
     if (!EnemySurface) {
         cout << "IMG_Error: " << IMG_GetError() << endl;
         return -1;
@@ -163,7 +163,7 @@ int main(int argc, char* args[]) {
     }
 
     // Load font
-    TTF_Font* MinecraftFont = TTF_OpenFont("Minecraft.ttf", 48);
+    TTF_Font* MinecraftFont = TTF_OpenFont("assets/fonts/Minecraft.ttf", 48);
     if (!MinecraftFont) {
        cout << "TTF_ERROR" << TTF_GetError() << endl;
        return -1;
