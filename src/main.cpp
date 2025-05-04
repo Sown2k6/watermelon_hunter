@@ -250,27 +250,7 @@ int main(int argc, char* args[]) {
             ItemPosX = dist(gen);
             lives--;
         }
-
-        // while (SDL_PollEvent(&e) != 0) {
-        //     if (e.type == SDL_QUIT) {
-        //         quit = true;
-        //     } else if (e.type == SDL_KEYDOWN) {
-        //         if (e.key.keysym.sym == SDLK_j) {
-        //             if (!isJKeyPressed) {
-        //                 // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
-        //                 int tempX = CharacterPosX;
-        //                 CharacterPosX = EnemyPosX;
-        //                 EnemyPosX = tempX;
-        //                 isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
-        //             }
-        //         }
-        //     } else if (e.type == SDL_KEYUP) {
-        //         if (e.key.keysym.sym == SDLK_j) {
-        //             isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
-        //         }
-        //     }
-        // }
-
+        
         // Moving Enemy
         EnemyPosX += enemyspeed;
         if (EnemyPosX >= 760) enemyspeed = -5;
