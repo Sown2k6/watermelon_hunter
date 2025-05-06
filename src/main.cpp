@@ -76,6 +76,10 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
 }
 
 SDL_Texture* YourScores_Texture;
+int alterSpeedItem;
+int alterSpeedCharacter;
+int alterSpeedEnemy;
+bool pause = false;
 
 int main(int argc, char* args[]) {
     
@@ -202,6 +206,7 @@ int main(int argc, char* args[]) {
     
     SDL_Event e;
     bool isJKeyPressed = false;
+    bool isPKeyPressed = false;
     bool isSpaceKeyPressed = false;
     // Menu loop
     bool quit = false;
@@ -217,14 +222,13 @@ int main(int argc, char* args[]) {
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_j) {
                     if (!isJKeyPressed) {
-                        // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
                         exitMenu = false;
-                        isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
+                        isJKeyPressed = true;
                     }
                 }
             } else if (e.type == SDL_KEYUP) {
                 if (e.key.keysym.sym == SDLK_j) {
-                    isJKeyPressed = false; // Đánh dấu là phím J đã được nhả ra
+                    isJKeyPressed = false;
                 }
             }
         }
@@ -299,18 +303,40 @@ int main(int argc, char* args[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_j && lives > 0) {
+                if (e.key.keysym.sym == SDLK_j && lives > 0 && !pause) {
                     if (!isJKeyPressed) {
-                        // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
                         int tempX = CharacterPosX;
                         CharacterPosX = EnemyPosX;
                         EnemyPosX = tempX;
-                        isJKeyPressed = true; // Đánh dấu là phím J đang được nhấn
+                        isJKeyPressed = true;
+                    }
+                }
+                if (ItemSpeed != 0)
+                {
+                    alterSpeedItem = ItemSpeed;
+                    alterSpeedCharacter = characterSpeed;
+                    alterSpeedEnemy = enemyspeed;
+                }
+                if (e.key.keysym.sym == SDLK_p) {
+                    if (!isPKeyPressed) {
+                        ItemSpeed = 0;
+                        characterSpeed = 0;
+                        enemyspeed = 0;
+                        SDL_RenderCopy(renderer, BackgroundTexture, NULL, NULL);
+                        isPKeyPressed = true;
+                        pause = true;
+                    }
+                    else
+                    {
+                        ItemSpeed = alterSpeedItem;
+                        enemyspeed = alterSpeedEnemy;
+                        characterSpeed = alterSpeedCharacter;
+                        isPKeyPressed = false;
+                        pause = false;
                     }
                 }
                 if (e.key.keysym.sym == SDLK_SPACE && lives <= 0) {
                     if (!isSpaceKeyPressed) {
-                        // Thực hiện hành động đổi chỗ chỉ khi phím Space vừa được nhấn
                         ItemPosX = 400;
                         ItemPosY = 300;
                         ItemSpeed = 3;
@@ -322,15 +348,15 @@ int main(int argc, char* args[]) {
                         EnemyPosX = 0;
                         EnemyPosY = 500;
                         enemyspeed = 5;
-                        isSpaceKeyPressed = true; // Đánh dấu là phím Space đang được nhấn
+                        isSpaceKeyPressed = true;
                     }
                 }
             } else if (e.type == SDL_KEYUP) {
                 if (e.key.keysym.sym == SDLK_SPACE) {
-                    isSpaceKeyPressed = false; // Đánh dấu là phím Space đã được nhả ra
+                    isSpaceKeyPressed = false;
                 }
                 if (e.key.keysym.sym == SDLK_j) {
-                    isJKeyPressed = false; // Đánh dấu là phím j đã được nhả ra
+                    isJKeyPressed = false;
                 }
 
             }
