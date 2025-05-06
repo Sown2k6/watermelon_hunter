@@ -38,7 +38,7 @@ int enemyspeed = 5;
 
 // All functions
 bool Collision(SDL_Rect a, SDL_Rect b);
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture, SDL_Texture* MenuTexture);
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* MenuTexture, SDL_Texture* OverMenuTexture);
 
 // Initialize
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
@@ -47,7 +47,7 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
         return false;
     }
 
-    window = SDL_CreateWindow("WaterMelon", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("WaterMelon Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return false;
@@ -76,7 +76,6 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
 }
 
 SDL_Texture* YourScores_Texture;
-SDL_Texture* GameOver_Texture;
 
 int main(int argc, char* args[]) {
     
@@ -88,6 +87,18 @@ int main(int argc, char* args[]) {
         return -1;
     }
     
+    // Load menu gameover
+    SDL_Surface* OverMenuSurface = IMG_Load("assets/images/overmenu.png");
+    if (!OverMenuSurface) {
+        cout << "IMG_Error: " << IMG_GetError() << endl;
+        return -1;
+    }
+    SDL_Texture* OverMenuTexture =SDL_CreateTextureFromSurface(renderer, OverMenuSurface);
+    SDL_FreeSurface(OverMenuSurface);
+    if (!OverMenuSurface) {
+        cout << "SDL_Error: " << SDL_GetError() << endl;
+        return -1;
+    }
     // Load menu
     SDL_Surface* MenuSurface = IMG_Load("assets/images/menu.png");
     if (!MenuSurface) {
@@ -186,18 +197,8 @@ int main(int argc, char* args[]) {
     // Colour black
     SDL_Color textColor = {0, 0, 0, 255};
     
-    SDL_Surface* GameOver_Surface = TTF_RenderText_Solid(MinecraftFont, "Game Over!", textColor);
-    if (!GameOver_Surface) {
-        cout << "ERROR" << TTF_GetError() << endl;
-        return -1;
-    }
-    
-    GameOver_Texture = SDL_CreateTextureFromSurface(renderer, GameOver_Surface);
-    SDL_FreeSurface(GameOver_Surface);
-    
     // Letter position
     SDL_Rect ScoresRect = {10, 10, 300, 50};
-    SDL_Rect GameOverRect = {250, 230, 270, 140};
     
     SDL_Event e;
     bool isJKeyPressed = false;
@@ -271,6 +272,9 @@ int main(int argc, char* args[]) {
         // Render character
         SDL_Rect characterRect = {CharacterPosX, CharacterPosY, CHARACTER_WIDTH, CHARACTER_HEIGHT};
         SDL_RenderCopy(renderer, characterTexture, NULL, &characterRect);
+
+        // OverMenu Rect
+        SDL_Rect OverMenuRect = {200, 200, 400, 200};
         
         // Update scores
         SDL_Surface* YourScores_Surface = TTF_RenderText_Solid(MinecraftFont, ("Your scores: " + to_string(scores)).c_str(), textColor);
@@ -285,7 +289,7 @@ int main(int argc, char* args[]) {
         SDL_RenderCopy(renderer, YourScores_Texture, NULL, &ScoresRect);
         if (lives <= 0)
         {
-            SDL_RenderCopy(renderer, GameOver_Texture, NULL, &GameOverRect);
+            SDL_RenderCopy(renderer, OverMenuTexture, NULL, &OverMenuRect);
             ItemSpeed = 0;
             characterSpeed = 0;
             enemyspeed = 0;    
@@ -365,11 +369,11 @@ int main(int argc, char* args[]) {
         SDL_Delay(12);
         }
         
-    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, GameOver_Texture, MenuTexture);
+    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, MenuTexture, OverMenuTexture);
             return 0;
 }
 
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* GameOver_Texture, SDL_Texture* MenuTexture)
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* MenuTexture, SDL_Texture* OverMenuTexture)
 {
     SDL_DestroyTexture(backTexture);
     SDL_DestroyTexture(YourScores_Texture);
@@ -377,7 +381,7 @@ void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture,
     SDL_DestroyTexture(itemTexture);
     SDL_DestroyTexture(EnemyTexture);
     SDL_DestroyTexture(MenuTexture);
-    SDL_DestroyTexture(GameOver_Texture);
+    SDL_DestroyTexture(OverMenuTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
