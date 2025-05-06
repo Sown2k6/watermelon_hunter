@@ -299,7 +299,7 @@ int main(int argc, char* args[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_j) {
+                if (e.key.keysym.sym == SDLK_j && lives > 0) {
                     if (!isJKeyPressed) {
                         // Thực hiện hành động đổi chỗ chỉ khi phím J vừa được nhấn
                         int tempX = CharacterPosX;
