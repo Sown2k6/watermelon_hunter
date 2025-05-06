@@ -38,7 +38,7 @@ int enemyspeed = 5;
 
 // All functions
 bool Collision(SDL_Rect a, SDL_Rect b);
-void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScores_Texture, SDL_Texture* MenuTexture, SDL_Texture* OverMenuTexture);
+void close(SDL_Window* window, SDL_Renderer* renderer, SDL_Texture* backTexture, SDL_Texture* characterTexture, SDL_Texture* itemTexture, SDL_Texture* EnemyTexture, SDL_Texture* YourScoresTexture, SDL_Texture* MenuTexture, SDL_Texture* OverMenuTexture);
 
 // Initialize
 bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
@@ -75,11 +75,12 @@ bool init(SDL_Window*& window, SDL_Renderer*& renderer) {
     return true;
 }
 
-SDL_Texture* YourScores_Texture;
+SDL_Texture* YourScoresTexture;
 int alterSpeedItem;
 int alterSpeedCharacter;
 int alterSpeedEnemy;
 bool pause = false;
+bool overyet = false;
 
 int main(int argc, char* args[]) {
     
@@ -112,6 +113,19 @@ int main(int argc, char* args[]) {
     SDL_Texture* MenuTexture = SDL_CreateTextureFromSurface(renderer, MenuSurface);
     SDL_FreeSurface(MenuSurface);
     if (!MenuTexture) {
+        cout << "SDL_Error: " << SDL_GetError() << endl;
+        return -1;
+    }
+
+    // Load menu ingame
+    SDL_Surface* IngameMenuSurface = IMG_Load("assets/images/ingamemenu.png");
+    if (!IngameMenuSurface) {
+        cout << "IMG_Error: " << IMG_GetError() << endl;
+        return -1;
+    }
+    SDL_Texture* IngameMenuTexture = SDL_CreateTextureFromSurface(renderer, IngameMenuSurface);
+    SDL_FreeSurface(IngameMenuSurface);
+    if (!IngameMenuTexture) {
         cout << "SDL_Error: " << SDL_GetError() << endl;
         return -1;
     }
@@ -239,6 +253,11 @@ int main(int argc, char* args[]) {
 
     // Main loop
     while (!quit) {
+
+        // over state
+        if (lives <= 0) overyet = true;
+        else overyet = false;
+
         // Falling item
         ItemPosY += ItemSpeed;
         if (scores == PointToSpeedUp)
@@ -286,12 +305,12 @@ int main(int argc, char* args[]) {
             cout << "ERROR" << TTF_GetError() << endl;
             return -1;
         }
-        YourScores_Texture = SDL_CreateTextureFromSurface(renderer, YourScores_Surface);
+        YourScoresTexture = SDL_CreateTextureFromSurface(renderer, YourScores_Surface);
         SDL_FreeSurface(YourScores_Surface);
         
         // Render words
-        SDL_RenderCopy(renderer, YourScores_Texture, NULL, &ScoresRect);
-        if (lives <= 0)
+        SDL_RenderCopy(renderer, YourScoresTexture, NULL, &ScoresRect);
+        if (overyet)
         {
             SDL_RenderCopy(renderer, OverMenuTexture, NULL, &OverMenuRect);
             ItemSpeed = 0;
@@ -318,15 +337,14 @@ int main(int argc, char* args[]) {
                     alterSpeedEnemy = enemyspeed;
                 }
                 if (e.key.keysym.sym == SDLK_p) {
-                    if (!isPKeyPressed) {
+                    if (!isPKeyPressed && !overyet) {
                         ItemSpeed = 0;
                         characterSpeed = 0;
                         enemyspeed = 0;
-                        SDL_RenderCopy(renderer, BackgroundTexture, NULL, NULL);
                         isPKeyPressed = true;
                         pause = true;
                     }
-                    else
+                    else if (isPKeyPressed && !overyet)
                     {
                         ItemSpeed = alterSpeedItem;
                         enemyspeed = alterSpeedEnemy;
@@ -335,7 +353,7 @@ int main(int argc, char* args[]) {
                         pause = false;
                     }
                 }
-                if (e.key.keysym.sym == SDLK_SPACE && lives <= 0) {
+                if (e.key.keysym.sym == SDLK_SPACE && (overyet || pause)) {
                     if (!isSpaceKeyPressed) {
                         ItemPosX = 400;
                         ItemPosY = 300;
@@ -349,6 +367,7 @@ int main(int argc, char* args[]) {
                         EnemyPosY = 500;
                         enemyspeed = 5;
                         isSpaceKeyPressed = true;
+                        pause = false;
                     }
                 }
             } else if (e.type == SDL_KEYUP) {
@@ -389,13 +408,16 @@ int main(int argc, char* args[]) {
             Mix_PlayChannel(-1, damagedSound, 0);
         }
 
+        if (pause)
+                {
+                    SDL_RenderCopy(renderer, IngameMenuTexture, NULL, &OverMenuRect);
+                }
 
-        
         SDL_RenderPresent(renderer);
         SDL_Delay(12);
         }
         
-    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScores_Texture, MenuTexture, OverMenuTexture);
+    close(window, renderer, BackgroundTexture, characterTexture, itemTexture, EnemyTexture, YourScoresTexture, MenuTexture, OverMenuTexture);
             return 0;
 }
 
